@@ -1,6 +1,7 @@
 import CSVUploader from "./components/CSVUploader";
 import ExperimentsList from "./components/ExperimentsList";
 import Header from "./components/Header";
+import MetricsList from "./components/MetricsList";
 
 const App = () => {
   return (
@@ -9,6 +10,7 @@ const App = () => {
       <main className="max-w-7xl mx-auto">
         <CSVUploader />
         <ExperimentsList />
+        <MetricsList />
       </main>
     </>
   );

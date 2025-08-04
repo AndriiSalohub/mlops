@@ -1,38 +1,20 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import { useExperimentsStore } from "@/store/experimentsStore";
-import type { ExperimentData } from "@/types/experiment.types";
 import ExperimentMetricsItem from "./ExperimentsListItem";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Search } from "lucide-react";
 
 const ExperimentMetricsList = () => {
-  const { experiments } = useExperimentsStore();
-  const [metricsByExperiment, setMetricsByExperiment] = useState<
-    Map<string, Set<string>>
-  >(new Map());
+  const {
+    experiments,
+    metricsByExperiment,
+    selectedExperiments,
+    selectExperiment,
+    selectAll,
+    deselectAll,
+  } = useExperimentsStore();
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedExperiments, setSelectedExperiments] = useState<Set<string>>(
-    new Set(),
-  );
-
-  useEffect(() => {
-    const experimentMetricsMap = new Map<string, Set<string>>();
-    experiments.forEach((experiment: ExperimentData) => {
-      if (!experiment.experiment_id || !experiment.metric_name) {
-        console.warn("Skipping invalid experiment:", experiment);
-        return;
-      }
-      if (!experimentMetricsMap.has(experiment.experiment_id)) {
-        experimentMetricsMap.set(experiment.experiment_id, new Set());
-      }
-      experimentMetricsMap
-        .get(experiment.experiment_id)!
-        .add(experiment.metric_name);
-    });
-
-    setMetricsByExperiment(experimentMetricsMap);
-  }, [experiments]);
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -42,21 +24,6 @@ const ExperimentMetricsList = () => {
     ([expId]) => expId.includes(searchTerm),
   );
 
-  const handleExperimentSelect = (
-    experimentId: string,
-    isSelected: boolean,
-  ) => {
-    setSelectedExperiments((prev) => {
-      const newSelected = new Set(prev);
-      if (isSelected) {
-        newSelected.add(experimentId);
-      } else {
-        newSelected.delete(experimentId);
-      }
-      return newSelected;
-    });
-  };
-
   const handleSelectAll = () => {
     const allFilteredIds = filteredExperiments.map(([expId]) => expId);
     const allSelected = allFilteredIds.every((id) =>
@@ -64,17 +31,9 @@ const ExperimentMetricsList = () => {
     );
 
     if (allSelected) {
-      setSelectedExperiments((prev) => {
-        const newSelected = new Set(prev);
-        allFilteredIds.forEach((id) => newSelected.delete(id));
-        return newSelected;
-      });
+      deselectAll();
     } else {
-      setSelectedExperiments((prev) => {
-        const newSelected = new Set(prev);
-        allFilteredIds.forEach((id) => newSelected.add(id));
-        return newSelected;
-      });
+      selectAll(allFilteredIds);
     }
   };
 
@@ -83,7 +42,7 @@ const ExperimentMetricsList = () => {
     filteredExperiments.every(([expId]) => selectedExperiments.has(expId));
 
   return (
-    <section className="mt-4 p-4 border-2 border-dashed rounded-sm">
+    <section className="mt-4 p-4 border-2 rounded-sm">
       {experiments.length === 0 ? (
         <h3 className="text-center text-slate-500">
           No experiments available.
@@ -91,7 +50,9 @@ const ExperimentMetricsList = () => {
       ) : (
         <>
           <div className="flex justify-between">
-            <p className="text-2xl font-semibold mb-2">Experiment Metrics</p>
+            <p className="text-2xl font-semibold mb-2">
+              Experiment Metrics ({filteredExperiments.length})
+            </p>
             <Button
               className="cursor-pointer"
               onClick={handleSelectAll}
@@ -119,7 +80,7 @@ const ExperimentMetricsList = () => {
                   experimentId={expId}
                   metrics={metrics}
                   isSelected={selectedExperiments.has(expId)}
-                  onSelectionChange={handleExperimentSelect}
+                  onSelectionChange={selectExperiment}
                 />
               ))}
             </ul>

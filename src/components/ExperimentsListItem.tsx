@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { useState } from "react";
 import { Badge } from "./ui/badge";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "@radix-ui/react-label";
@@ -10,15 +10,24 @@ interface ExperimentMetricsItemProps {
   onSelectionChange: (experimentId: string, isSelected: boolean) => void;
 }
 
-const ExperimentMetricsItem: FC<ExperimentMetricsItemProps> = ({
+const ExperimentMetricsItem = ({
   experimentId,
   metrics,
   isSelected,
   onSelectionChange,
-}) => {
+}: ExperimentMetricsItemProps) => {
+  const VISIBLE_LIMIT = 3;
+  const [showAllMetrics, setShowAllMetrics] = useState(false);
+
   const handleCheckboxChange = (checked: boolean) => {
     onSelectionChange(experimentId, checked);
   };
+
+  const handleToggleMetrics = () => {
+    setShowAllMetrics(!showAllMetrics);
+  };
+
+  const metricsLength = Array.from(metrics).length;
 
   return (
     <li className="flex items-center gap-2">
@@ -34,17 +43,51 @@ const ExperimentMetricsItem: FC<ExperimentMetricsItemProps> = ({
           <span className="font-semibold">{experimentId}</span>
         </Label>
         <ul className="flex gap-2">
-          {Array.from(metrics).map((metric) => (
-            <li>
+          {metricsLength > VISIBLE_LIMIT && !showAllMetrics ? (
+            <>
+              {Array.from(metrics)
+                .slice(0, VISIBLE_LIMIT)
+                .map((metric) => (
+                  <li>
+                    <Badge
+                      key={metric}
+                      variant="secondary"
+                      className="text-sm font-semibold"
+                    >
+                      {metric}
+                    </Badge>
+                  </li>
+                ))}
               <Badge
-                key={metric}
-                variant="secondary"
-                className="text-sm font-semibold"
+                variant="outline"
+                className="text-sm font-semibold cursor-pointer"
+                onClick={handleToggleMetrics}
               >
-                {metric}
+                +{metricsLength - VISIBLE_LIMIT}
               </Badge>
-            </li>
-          ))}
+            </>
+          ) : (
+            <>
+              {Array.from(metrics).map((metric) => (
+                <li key={metric}>
+                  <Badge variant="secondary" className="text-sm font-semibold">
+                    {metric}
+                  </Badge>
+                </li>
+              ))}
+              {metricsLength > VISIBLE_LIMIT && (
+                <li>
+                  <Badge
+                    variant="outline"
+                    className="text-sm font-semibold cursor-pointer"
+                    onClick={handleToggleMetrics}
+                  >
+                    Show Less
+                  </Badge>
+                </li>
+              )}
+            </>
+          )}
         </ul>
       </div>
     </li>
