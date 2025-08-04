@@ -1,20 +1,19 @@
-import { useEffect, useState, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import Papa from "papaparse";
 import type { ExperimentData } from "@/types/experiment.types";
 import { Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "./ui/progress";
+import { useExperimentsStore } from "@/store/experimentsStore";
 
 type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const CSVUploader = () => {
+  const { uploadExperiments } = useExperimentsStore();
   const [file, setFile] = useState<File | null>(null);
-  const [data, setData] = useState<ExperimentData[]>([]);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  console.log(file);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -50,7 +49,7 @@ const CSVUploader = () => {
           }
         },
         complete: () => {
-          setData(parsedData);
+          uploadExperiments(parsedData);
           setStatus("success");
           setUploadProgress(100);
           console.log("Parsed CSV:", parsedData);
@@ -67,14 +66,6 @@ const CSVUploader = () => {
       });
     }
   };
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
-
-  useEffect(() => {
-    console.log(uploadProgress);
-  }, [uploadProgress]);
 
   return (
     <section className="border-2 border-dashed rounded-sm flex items-center p-4 flex-col">
