@@ -48,7 +48,7 @@ const ExperimentMetricsItem = ({
               {Array.from(metrics)
                 .slice(0, VISIBLE_LIMIT)
                 .map((metric) => (
-                  <li>
+                  <li key={metric}>
                     <Badge
                       key={metric}
                       variant="secondary"

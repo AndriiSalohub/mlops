@@ -1,6 +1,7 @@
 import CSVUploader from "./components/CSVUploader";
 import ExperimentsList from "./components/ExperimentsList";
 import Header from "./components/Header";
+import LineGraph from "./components/LineChart";
 import MetricsList from "./components/MetricsList";
 
 const App = () => {
@@ -11,6 +12,7 @@ const App = () => {
         <CSVUploader />
         <ExperimentsList />
         <MetricsList />
+        <LineGraph />
       </main>
     </>
   );

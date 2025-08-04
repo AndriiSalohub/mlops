@@ -9,8 +9,6 @@ const MetricsList = () => {
     selectMetric(metric, checked);
   };
 
-  console.log(selectedMetrics);
-
   return (
     <section className="mt-4 p-4 border-2 rounded-sm mb-4">
       {metrics.size === 0 ? (

@@ -10,7 +10,6 @@ type UploadStatus = "idle" | "uploading" | "success" | "error";
 
 const CSVUploader = () => {
   const { uploadExperiments } = useExperimentsStore();
-  const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -18,7 +17,6 @@ const CSVUploader = () => {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
       const selectedFile = event.target.files[0];
-      setFile(selectedFile);
       setStatus("uploading");
       setUploadProgress(0);
       setErrorMessage(null);
