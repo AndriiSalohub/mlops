@@ -6,15 +6,28 @@ import { Label } from "@radix-ui/react-label";
 interface ExperimentMetricsItemProps {
   experimentId: string;
   metrics: Set<string>;
+  isSelected: boolean;
+  onSelectionChange: (experimentId: string, isSelected: boolean) => void;
 }
 
 const ExperimentMetricsItem: FC<ExperimentMetricsItemProps> = ({
   experimentId,
   metrics,
+  isSelected,
+  onSelectionChange,
 }) => {
+  const handleCheckboxChange = (checked: boolean) => {
+    onSelectionChange(experimentId, checked);
+  };
+
   return (
     <li className="flex items-center gap-2">
-      <Checkbox className="cursor-pointer" id={experimentId} />
+      <Checkbox
+        className="cursor-pointer"
+        id={experimentId}
+        checked={isSelected}
+        onCheckedChange={handleCheckboxChange}
+      />
       <div>
         <Label htmlFor={experimentId} className="cursor-pointer mb-1">
           Experiment Identifier:{" "}
